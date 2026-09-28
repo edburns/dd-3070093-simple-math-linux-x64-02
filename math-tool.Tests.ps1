@@ -62,5 +62,6 @@ Describe 'math-tool.ps1 direct CLI invocation (isolated process)' {
 
         $result.ExitCode | Should -Be 0
         $result.StdOut | Should -Be "Fibonacci($N) = $Expected`n"
+        $result.StdErr | Should -BeNullOrEmpty
     }
 }

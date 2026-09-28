@@ -23,8 +23,13 @@ function Get-Fibonacci {
     return $previous
 }
 
-$script:IsDotSourced = ($MyInvocation.InvocationName -eq '.') -or ($MyInvocation.CommandOrigin -eq 'Internal')
-if (-not $script:IsDotSourced) {
+# When this file is dot-sourced (". ./math-tool.ps1"), PowerShell sets
+# $MyInvocation.InvocationName to the literal string '.' for the script's own
+# invocation record. When invoked directly (e.g. "pwsh -File math-tool.ps1"),
+# InvocationName is the script path instead. This distinguishes "load the
+# functions" from "run the CLI" so dot-sourcing never produces incidental
+# stdout.
+if ($MyInvocation.InvocationName -ne '.') {
     $value = Get-Fibonacci -N $N
     Write-Output "Fibonacci($N) = $value"
 }

@@ -57,9 +57,6 @@ Describe 'math-tool.ps1 direct CLI invocation (isolated process)' {
         $result = Invoke-MathToolProcess -N $N
 
         $result.ExitCode | Should -Be 0
-
-        $lines = @($result.StdOut -split "`r?`n" | Where-Object { $_ -ne '' })
-        $lines.Count | Should -Be 1
-        $lines[0] | Should -Be "Fibonacci($N) = $Expected"
+        $result.StdOut | Should -Be "Fibonacci($N) = $Expected`n"
     }
 }

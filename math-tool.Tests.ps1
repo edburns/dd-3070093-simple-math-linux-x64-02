@@ -21,10 +21,37 @@ Describe 'Get-Fibonacci (unit)' {
     }
 }
 
+Describe 'Get-Factorial (unit)' {
+    It 'returns only numeric 1 for N=0' {
+        $result = @(Get-Factorial -N 0)
+
+        $result.Count | Should -Be 1
+        $result[0] | Should -BeOfType ([System.Numerics.BigInteger])
+        $result[0] | Should -Be 1
+    }
+
+    It 'returns only numeric 1 for N=1' {
+        $result = @(Get-Factorial -N 1)
+
+        $result.Count | Should -Be 1
+        $result[0] | Should -BeOfType ([System.Numerics.BigInteger])
+        $result[0] | Should -Be 1
+    }
+
+    It 'returns only numeric 120 for N=5' {
+        $result = @(Get-Factorial -N 5)
+
+        $result.Count | Should -Be 1
+        $result[0] | Should -BeOfType ([System.Numerics.BigInteger])
+        $result[0] | Should -Be 120
+    }
+}
+
 Describe 'math-tool.ps1 direct CLI invocation (isolated process)' {
     BeforeAll {
         function Invoke-MathToolProcess {
             param(
+                [string]$Operation,
                 [int]$N
             )
 
@@ -33,7 +60,7 @@ Describe 'math-tool.ps1 direct CLI invocation (isolated process)' {
             $stderrPath = [System.IO.Path]::GetTempFileName()
             try {
                 $process = Start-Process -FilePath $pwsh `
-                    -ArgumentList @('-NoLogo', '-NoProfile', '-File', $script:MathToolPath, '-N', $N) `
+                    -ArgumentList @('-NoLogo', '-NoProfile', '-File', $script:MathToolPath, '-Operation', $Operation, '-N', $N) `
                     -NoNewWindow -PassThru -Wait `
                     -RedirectStandardOutput $stdoutPath `
                     -RedirectStandardError $stderrPath
@@ -51,17 +78,20 @@ Describe 'math-tool.ps1 direct CLI invocation (isolated process)' {
         }
     }
 
-    It 'exits zero and writes exactly one result line for N=<N>' -TestCases @(
-        @{ N = 0; Expected = 0 }
-        @{ N = 1; Expected = 1 }
-        @{ N = 10; Expected = 55 }
+    It 'exits zero and writes exactly one result line for <Operation> N=<N>' -TestCases @(
+        @{ Operation = 'fibonacci'; N = 0; Expected = 'Fibonacci(0) = 0' }
+        @{ Operation = 'fibonacci'; N = 1; Expected = 'Fibonacci(1) = 1' }
+        @{ Operation = 'fibonacci'; N = 10; Expected = 'Fibonacci(10) = 55' }
+        @{ Operation = 'factorial'; N = 0; Expected = 'Factorial(0) = 1' }
+        @{ Operation = 'factorial'; N = 1; Expected = 'Factorial(1) = 1' }
+        @{ Operation = 'factorial'; N = 5; Expected = 'Factorial(5) = 120' }
     ) {
-        param($N, $Expected)
+        param($Operation, $N, $Expected)
 
-        $result = Invoke-MathToolProcess -N $N
+        $result = Invoke-MathToolProcess -Operation $Operation -N $N
 
         $result.ExitCode | Should -Be 0
-        $result.StdOut | Should -Be "Fibonacci($N) = $Expected`n"
+        $result.StdOut | Should -Be "$Expected`n"
         $result.StdErr | Should -BeNullOrEmpty
     }
 }

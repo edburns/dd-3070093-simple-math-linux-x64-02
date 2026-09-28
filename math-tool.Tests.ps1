@@ -15,6 +15,10 @@ Describe 'Get-Fibonacci (unit)' {
     It 'returns 55 for N=10 (representative value)' {
         Get-Fibonacci -N 10 | Should -Be 55
     }
+
+    It 'returns an exact value beyond the Int64 range' {
+        Get-Fibonacci -N 93 | Should -Be ([System.Numerics.BigInteger]::Parse('12200160415121876738'))
+    }
 }
 
 Describe 'math-tool.ps1 direct CLI invocation (isolated process)' {

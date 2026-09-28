@@ -12,8 +12,8 @@ function Get-Fibonacci {
         [int]$N
     )
 
-    $previous = 0
-    $current = 1
+    $previous = [System.Numerics.BigInteger]::Zero
+    $current = [System.Numerics.BigInteger]::One
     for ($i = 0; $i -lt $N; $i++) {
         $next = $previous + $current
         $previous = $current

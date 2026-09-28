@@ -23,7 +23,8 @@ function Get-Fibonacci {
     return $previous
 }
 
-if ($MyInvocation.InvocationName -ne '.') {
+$script:IsDotSourced = ($MyInvocation.InvocationName -eq '.') -or ($MyInvocation.CommandOrigin -eq 'Internal')
+if (-not $script:IsDotSourced) {
     $value = Get-Fibonacci -N $N
     Write-Output "Fibonacci($N) = $value"
 }
